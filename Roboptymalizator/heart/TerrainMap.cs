@@ -36,6 +36,8 @@ namespace Roboptymalizator.heart
                 {
                     fields[i, j] = new Field(r.NextDouble() * 200.0);
                 }
+            fields[r.Next(0, n), r.Next(0, m)].SetStart();
+            fields[r.Next(0, n), r.Next(0, m)].SetStop();
         }
 
         public void ShowTerrainMap()
@@ -44,7 +46,11 @@ namespace Roboptymalizator.heart
             for (int i = 0; i < fields.GetLength(0); i++)
             {
                 for (int j = 0; j < fields.GetLength(1); j++)
+                {
+                    Console.Write(fields[i, j].IsStart() ? " S " : "");
+                    Console.Write(fields[i, j].IsStop() ? " X " : "");
                     Console.Write(fields[i, j].GetHeight() + " : ");
+                }
                 Console.WriteLine();
             }
         }
