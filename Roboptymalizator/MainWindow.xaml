@@ -3,6 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Label Content="n" HorizontalAlignment="Left" Height="30" Margin="10,33,0,0" VerticalAlignment="Top" Width="60"/>
+        <Label Content="m" HorizontalAlignment="Left" Height="30" Margin="10,68,0,0" VerticalAlignment="Top" Width="60"/>
+        <TextBox Name="nIn" HorizontalAlignment="Left" Height="30" Margin="56,33,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="64"/>
+        <TextBox Name="mIn" HorizontalAlignment="Left" Height="30" Margin="56,72,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="64"/>
+        <Button Name="generateRandomButton" Content="Generate Random" HorizontalAlignment="Left" Height="40" Margin="10,119,0,0" VerticalAlignment="Top" Width="110" Click="generateRandomButton_Click"/>
+
     </Grid>
 </Window>
