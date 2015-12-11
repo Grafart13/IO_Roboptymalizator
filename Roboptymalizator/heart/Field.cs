@@ -11,11 +11,13 @@ namespace Roboptymalizator.heart
         private double height;
         private bool isStart;
         private bool isStop;
+        private Move[] moves;
 
         public Field(double _height)
         {
             this.height = _height;
             this.isStart = this.isStop = false;
+            this.moves = new Move[4]; // or 8 if we set up movement diagonally
         }
 
         public void SetStart()
@@ -44,6 +46,12 @@ namespace Roboptymalizator.heart
         public void SetHeight(double _h)
         {
             this.height = _h;
+        }
+
+        public void AddMove(int where, Move move)
+        {
+            if ((where < 4) && (where > -1))
+                moves[where] = move;
         }
     }
 }
