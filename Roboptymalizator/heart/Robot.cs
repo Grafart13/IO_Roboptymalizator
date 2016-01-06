@@ -16,6 +16,7 @@ namespace Roboptymalizator.heart
         // where is robot on grid?
         private Field start;
         private LinkedList<Field> visited;
+        // private LinkedList<Move> moves; // is it important?
 
         public Robot(TerrainMap terrain)
         {
@@ -34,15 +35,31 @@ namespace Roboptymalizator.heart
             return this.start;
         }
 
-        private void BurnFuel(Move move)
+        private double BurnFuel(Move move)
         {
             // function of burning fuel
             // for example
-
+            double loseFuel = 0.0;
             if (move.IsUp())
-                fuelLevel -= move.GetDist() * burning + Math.Pow(5.4, move.GetAlfa());
+                loseFuel = move.GetDist() * burning + Math.Pow(5.4, move.GetAlfa());
             else
-                fuelLevel -= move.GetDist() * burning + Math.Log10(move.GetAlfa());
+                loseFuel -= move.GetDist() * burning + Math.Log10(move.GetAlfa());
+            return loseFuel;
+        }
+
+        public double Move(Move move)
+        {
+            double loseFuel = BurnFuel(move);
+            if (fuelLevel - loseFuel < 0)
+            {
+                return -1.0;
+            }
+            else
+            {
+                fuelLevel -= loseFuel;
+                visited.AddLast(move.GetToField());
+                return loseFuel;
+            }
         }
     }
 }
