@@ -88,5 +88,15 @@ namespace Roboptymalizator.heart
                 Console.WriteLine();
             }
         }
+
+        public Field GetStart()
+        {
+            foreach(Field f in fields)
+            {
+                if (f.IsStart() == true)
+                    return f;
+            }
+            return null;
+        }
     }
 }

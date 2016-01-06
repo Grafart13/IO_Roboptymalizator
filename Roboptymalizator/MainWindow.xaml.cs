@@ -21,6 +21,8 @@ namespace Roboptymalizator
     public partial class MainWindow : Window
     {
         heart.TerrainMap terrainMap;
+        heart.Robot robot;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -43,6 +45,8 @@ namespace Roboptymalizator
 
             terrainMap = new heart.TerrainMap(n, m);
             terrainMap.ShowTerrainMap();
+
+            robot = new heart.Robot(terrainMap);
         }
     }
 }

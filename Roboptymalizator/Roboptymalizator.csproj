@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="heart\Field.cs" />
     <Compile Include="heart\Move.cs" />
+    <Compile Include="heart\Robot.cs" />
     <Compile Include="heart\TerrainMap.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
