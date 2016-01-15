@@ -7,21 +7,21 @@ namespace Roboptymalizator.geneticOptymalization
 {
     class Gene
     {
-        public int value { get; set; }
+        public Tuple<int,int> value { get; set; }
 
-        public Gene(int _value)
+        public Gene(Tuple<int, int> _value)
         {
             value = _value;
         }
 
         public static bool operator ==(Gene a, Gene b)
         {
-            return a.value == b.value;
+            return (a.value.Item1 == b.value.Item1) && (a.value.Item2 == b.value.Item2);
         }
 
         public static bool operator !=(Gene a, Gene b)
         {
-            return a.value != b.value;
+            return ! (a == b);
         }
 
         public bool Equals(Gene b)

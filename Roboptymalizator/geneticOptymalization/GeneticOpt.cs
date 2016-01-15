@@ -19,6 +19,15 @@ namespace Roboptymalizator.geneticOptymalization
 
         // kod genetyczny osobnika = (x, fi) x - punkt, fi - wartość dodatnia rzeczywista
 
+        private FitnessService fitnessService;
+        private Population population;
+        public GeneticOpt (heart.TerrainMap tm, heart.Robot rob)
+        {
+            fitnessService = new FitnessService(tm, rob);
+            
+            population = new Population(10, 3, 5, fitnessService);
+
+        }
 
     }
 }

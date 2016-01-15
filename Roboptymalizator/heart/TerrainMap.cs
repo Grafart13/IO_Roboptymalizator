@@ -10,13 +10,15 @@ namespace Roboptymalizator.heart
     {
         private Field[,] fields;
         private double x = 10.0; // is the width of the grid
+        private Tuple<int, int> startInd;
+        private Tuple<int, int> stopInd;
 
         public TerrainMap()
         {
             // generate Terrain Map for testing
             for (int i = 0; i < 10; i++)
                 for (int j = 0; j < 10; j++)
-                    fields[i, j] = new Field(2 * i + 3 * j + 0.2);
+                    fields[i, j] = new Field(2 * i + 3 * j + 0.2, new Tuple<int,int>(i,j));
             
         }
         public TerrainMap(String name)
@@ -37,10 +39,18 @@ namespace Roboptymalizator.heart
             for(int i=0; i<n; i++)
                 for (int j=0; j<m; j++)
                 {
-                    fields[i, j] = new Field(r.NextDouble() * 200.0);
+                    fields[i, j] = new Field(r.NextDouble() * 200.0, new Tuple<int,int>(i,j));
                 }
-            fields[r.Next(0, n), r.Next(0, m)].SetStart();
-            fields[r.Next(0, n), r.Next(0, m)].SetStop();
+            int a = r.Next(0, n);
+            int b = r.Next(0, m);
+            fields[a,b].SetStart();
+            
+            startInd = new Tuple<int,int>(a, b);
+            
+            a = r.Next(0, n);
+            b = r.Next(0, m);
+            fields[a,b].SetStop();
+            stopInd = new Tuple<int, int>(a, b);
         }
 
         private void AddMoves()
@@ -89,14 +99,42 @@ namespace Roboptymalizator.heart
             }
         }
 
-        public Field GetStart()
+        public Field GetField(int x, int y)
         {
-            foreach(Field f in fields)
-            {
-                if (f.IsStart() == true)
-                    return f;
-            }
-            return null;
+            return fields[x, y];
         }
+        public Field GetStartField()
+        {
+            return GetField(startInd.Item1, startInd.Item2);
+        }
+        public Tuple<int, int> GetStartInd()
+        {
+            return startInd;
+        }
+
+        public Tuple<int, int> GetStopInd()
+        {
+            return stopInd;
+        
+        }
+        public Field GetStopField()
+        {
+            return GetField(stopInd.Item1, stopInd.Item2);
+        }
+        
+        public int getLenght0()
+        {
+            return fields.GetLength(0);
+        }
+        public int getLenght1()
+        {
+            return fields.GetLength(1);
+        }
+
+        public Tuple<int, int> GetSizeOfMap()
+        {
+            return new Tuple<int, int>(getLenght0(), getLenght1());
+        }
+
     }
 }

@@ -8,6 +8,7 @@ namespace Roboptymalizator.geneticOptymalization
 {
     class Generation
     {
+        // dane pokolenie
         public int number { get; private set; }
         public List<Chromosom> chromosomes { get; set; }
         public Chromosom bestCh { get; set; }

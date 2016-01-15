@@ -8,20 +8,24 @@ namespace Roboptymalizator.geneticOptymalization
 {
     class Population
     {
+        // populacja wszystkich pokoleń
         public List<Generation> generations { get; private set; }
         private int minSize;
-        private int maxSize;
-        private Chromosom chFirst;
+        private int numOfGeneration;
+        private int numOfChromosoms;
+        private int lenghtOfChromosom;
+        private Chromosom chFirst { get; set; }
 
-        public Population (int min, int max, Chromosom chromosomFirst)
+        private FitnessService fs;
+
+        public Population (int lenghtOfChromosom, int numOfChromosoms, int numOfGeneration, FitnessService fs)
         {
-            // min = min size of population
-            // max = max size of population
-
-            this.minSize = min;
-            this.maxSize = max;
-            this.chFirst = chromosomFirst;
+            
+            this.lenghtOfChromosom = lenghtOfChromosom;
+            this.numOfChromosoms = numOfChromosoms;
+            this.numOfGeneration = numOfGeneration;
             generations = new List<Generation>();
+            this.fs = fs;
         }
 
         public void createInitialGeneration()
@@ -29,7 +33,20 @@ namespace Roboptymalizator.geneticOptymalization
             int numGeneration = 0;
             List<Chromosom> chromosoms = new List<Chromosom>();
 
+            heart.TerrainMap tm = fs.terrain;
+
+            for (int i=0; i<numOfChromosoms; i++)
+            {
+                Chromosom ch = new Chromosom(lenghtOfChromosom);
+                ch.RandomGenes(tm.GetStartInd(), tm.GetStopInd(), tm.GetSizeOfMap());
+                chromosoms.Add(ch);
+            }
+            generations.Add(new Generation(numGeneration, chromosoms));
         }
 
+        public void ToString()
+        {
+            
+        }
     }
 }

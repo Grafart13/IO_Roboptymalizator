@@ -8,7 +8,7 @@ namespace Roboptymalizator.heart
 {
     class Robot
     {
-        private double fuelLevel;
+        public double fuelLevel {  get; private set; }
         private const double burning = 2.3; // burning fuel / dist
         private const double maxFuel = 100.0;
         
@@ -22,7 +22,7 @@ namespace Roboptymalizator.heart
         {
             this.terrain = terrain;
 
-            this.start = terrain.GetStart();
+            this.start = terrain.GetStartField();
             if (start == null)
                 System.Console.WriteLine("Something went wrong.");
             visited = new LinkedList<Field>();
@@ -35,15 +35,15 @@ namespace Roboptymalizator.heart
             return this.start;
         }
 
-        private double BurnFuel(Move move)
+        public double BurnFuel(Move move)
         {
             // function of burning fuel
             // for example
-            double loseFuel = 0.0;
+            double loseFuel = move.GetDist() * burning;
             if (move.IsUp())
-                loseFuel = move.GetDist() * burning + Math.Pow(5.4, move.GetAlfa());
+                loseFuel += Math.Pow(5.4, move.GetAlfa());
             else
-                loseFuel -= move.GetDist() * burning + Math.Log10(move.GetAlfa());
+                loseFuel -= Math.Log10(move.GetAlfa());
             return loseFuel;
         }
 
