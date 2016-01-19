@@ -8,15 +8,24 @@ namespace Roboptymalizator.geneticOptymalization
 {
     class Chromosom
     {
-        private Gene[] genes; // field number in each column
-        public int lenght { get; set; } // lenght of gene
+       // private Gene[] genes; // field number in each column
+        private List<Gene> genesList;
+        private int numOfGenes;
+//        public int lenght { get; set; } // lenght of gene
         public double fitness {  get; set; }
 
 
-        public Chromosom(int lenght)
+        public Chromosom()
         {
-            this.lenght = lenght;
-            this.genes = new Gene[lenght];
+  //          this.lenght = lenght;
+            //this.genes = new Gene[lenght];
+            this.genesList = new List<Gene>();
+        }
+
+        public Chromosom(int numOfGenes)
+        {
+            this.numOfGenes = numOfGenes;
+            this.genesList = new List<Gene>();
         }
 
         public int CompareTo(Chromosom a)
@@ -65,35 +74,43 @@ namespace Roboptymalizator.geneticOptymalization
             return !(a < b) && (a != b);
         }
 
+        /*
         public void ReplaceGene(int ind, Gene g)
         {
             if ((ind < 0) || (ind >= lenght))
                 throw new ArgumentOutOfRangeException();
             genes[ind] = g;
-          //  fitness = null;
-        }
 
-        public void ReplaceGenes(int indStart, int indStop, Gene [] g)
+            fitness = null;
+        }
+        */
+
+        public void ReplaceGenes(int indStart, int indStop, List<Gene> g)
         {
-            if ((indStart < 0) || (indStart >= lenght))
+            if ((indStart < 0) || (indStart >= genesList.ToArray().Length))
                 throw new ArgumentOutOfRangeException();
-            int last = (indStart + g.Length);
-            if (last >= lenght)
+            int last = (indStart + g.ToArray().Length);
+            if (last >= genesList.ToArray().Length)
                 throw new ArgumentException("Too many genes to replace");
-            Array.Copy(g, 0, genes, indStart, g.Length);
+         //   Array.Copy(g, 0, genes, indStart, g.Length);
            // fitness = null;
         }
 
         public Gene GetGene(int ind)
         {
-            return genes[ind];
+            return genesList[ind];
         }
 
-        public Gene[] GetGenes()
+        public List<Gene> GetGenes()
         {
-            return genes;
+            return genesList;
         }
-
+        public List<Gene> GetGenesList()
+        {
+            return genesList;
+        }
+        
+        /*
         private int GenerateGenesFromTo(Tuple<int, int> from, Tuple<int, int> to, int ind, ref Gene [] genesTab)
         {
             //  zaczynamy generować step <ind>
@@ -125,18 +142,47 @@ namespace Roboptymalizator.geneticOptymalization
             }
             return ind;
         }
+        */
 
-        private void GenerateStep(Tuple<int, int> from, Tuple<int, int> to, ref int ind, ref Gene[] genes)
+        private void GenerateGenesFromTo(Tuple<int, int> from, Tuple<int, int> to, ref List<Gene> genesAim)
+        {
+            // idziemy from -> to w linii prostej poziomo lub pionowo
+            
+            if (from.Item1 == to.Item1)
+            {
+                // pionowo
+                int steps = Math.Abs(from.Item2 - to.Item2);
+                for (int i = 1; i <= steps; i++)
+                {
+                    if (from.Item2 < to.Item2)
+                        genesAim.Add(new Gene(new Tuple<int, int>(from.Item1, from.Item2 + i)));
+                    else
+                        genesAim.Add(new Gene(new Tuple<int, int>(from.Item1, from.Item2 - i)));
+                }
+            }
+            else
+            {
+                // poziomo
+                int steps = Math.Abs(from.Item1 - to.Item1);
+                for (int i = 1; i <= steps; i++)
+                {
+                    if (from.Item1 < to.Item1)
+                        genesAim.Add(new Gene(new Tuple<int, int>(from.Item1 + i, from.Item2)));
+                    else
+                        genesAim.Add(new Gene(new Tuple<int, int>(from.Item1 - i, from.Item2)));
+                }
+            }
+        }
+
+        private void GenerateStep(Tuple<int, int> from, Tuple<int, int> to, ref List<Gene> genesAim)
         {
             if (from.Item1 == to.Item1)
             {
-                int ind_pom = GenerateGenesFromTo(from, to, ind, ref genes);
-                ind = ind_pom;
+                GenerateGenesFromTo(from, to, ref genesAim);
             }
             else if (from.Item2 == to.Item2)
             {
-                int ind_pom = GenerateGenesFromTo(from, to, ind, ref genes);
-                ind = ind_pom;
+                GenerateGenesFromTo(from, to, ref genesAim);
             }
             else
             {
@@ -152,13 +198,13 @@ namespace Roboptymalizator.geneticOptymalization
                     // najpierw poziomo
                     pom = new Tuple<int, int>(to.Item1, from.Item2);
 
-                int ind_pom = GenerateGenesFromTo(from, pom, ind, ref genes);
-                ind = GenerateGenesFromTo(pom, to, ind_pom, ref genes);
+                GenerateGenesFromTo(from, pom, ref genesAim);
+                GenerateGenesFromTo(pom, to, ref genesAim);
             }
         }
         public void RandomGenes(Tuple<int, int> start, Tuple<int, int> stop, Tuple<int,int> sizeOfMap)
         {
-            
+            //int lenght = genesList.ToArray().Length;
             int ind = 1;
             int ind_pom;
 
@@ -166,19 +212,12 @@ namespace Roboptymalizator.geneticOptymalization
             int m = sizeOfMap.Item2;
             
             int taxicMetric = Math.Abs(start.Item1 - stop.Item1) + Math.Abs(start.Item2 - stop.Item2);
-            int diff = lenght - taxicMetric;
+            int diff = numOfGenes - taxicMetric;
             if (diff <= 0)
             {
-                genes = new Gene[taxicMetric+1];
-                
-                genes[0] = new Gene(start);
-                genes[genes.Length - 1] = new Gene(stop);
+               // genes = new Gene[taxicMetric+1];
 
-                lenght = taxicMetric;
-
-                //Tuple<int, int> pom = new Tuple<int, int>(start.Item1, stop.Item2);
-                //int ind_pom = GenerateGenesFromTo(start, pom , ind);
-                //ind = GenerateGenesFromTo(pom, stop, ind_pom);
+                genesList.Add(new Gene(start));
 
                 // losowanie punktu przez który będziemy przechodzić
                 Random rn = new Random();
@@ -188,120 +227,90 @@ namespace Roboptymalizator.geneticOptymalization
 
                 Tuple<int, int> point = new Tuple<int, int>(x, y);
 
-                GenerateStep(start, point, ref ind, ref genes);
-                GenerateStep(point, stop, ref ind, ref genes);
-
-                //if (point.Item1 == start.Item1)
-                //{
-                //    point = new Tuple<int, int>(start.Item1, point.Item2);
-                //    ind_pom = GenerateGenesFromTo(start, point, ind, ref this.genes);
-                //    ind = GenerateGenesFromTo(point, stop, ind_pom, ref this.genes);
-                //}
-                //else if (point.Item2 == start.Item2)
-                //{
-                //    point = new Tuple<int, int>(point.Item1, start.Item2);
-                //    ind_pom = GenerateGenesFromTo(start, point, ind, ref this.genes);
-                //    ind = GenerateGenesFromTo(point, stop, ind_pom, ref this.genes);
-                //}
-                
-                //else
-                //{
-                //    int decission = rn.Next();
-                //    Tuple<int, int> pom;
-                //    if (decission % 2 == 0)
-                //        pom = new Tuple<int, int>(point.Item1, start.Item2);
-                //    else
-                //        pom = new Tuple<int, int>(start.Item1, point.Item2);
-
-                //    ind_pom = GenerateGenesFromTo(start, pom, ind, ref this.genes);
-                //    ind = GenerateGenesFromTo(pom, point, ind_pom, ref this.genes);
-
-                //    decission = rn.Next();
-                //    if (decission % 2 == 0)
-                //        pom = new Tuple<int, int>(point.Item1, stop.Item2);
-                //    else
-                //        pom = new Tuple<int, int>(stop.Item1, pom.Item2);
-                //    ind_pom = GenerateGenesFromTo(point, pom, ind, ref this.genes);
-                //    ind = GenerateGenesFromTo(pom, stop, ind_pom, ref this.genes);
-                //}
-                
+                GenerateStep(start, point, ref genesList);
+                GenerateStep(point, stop, ref genesList);
+                genesList.Add(new Gene(stop));
             }
             else
             {
+                genesList.Add(new Gene(start));
+
                 int div = diff / 2; // kazde odchylenie generuje +2 ruchy -> div = ile odchyleń
                 if ((start.Item1 < stop.Item1) && (start.Item1 - div > 0))
                 {
                     Tuple<int, int> away = new Tuple<int, int>(start.Item1 - div, start.Item2);
-                    ind = GenerateGenesFromTo(start, away, ind, ref this.genes);
+                    GenerateGenesFromTo(start, away, ref this.genesList);
                     Tuple<int, int> pom = new Tuple<int, int>(away.Item1, stop.Item2);
-                    ind = GenerateGenesFromTo(away, pom, ind, ref this.genes);
-                    ind = GenerateGenesFromTo(pom, stop, ind, ref this.genes);
+                    GenerateGenesFromTo(away, pom, ref this.genesList);
+                    GenerateGenesFromTo(pom, stop, ref this.genesList);
                 }
                 else if ((start.Item1 >= stop.Item1) && (start.Item1 + div < sizeOfMap.Item1))
                 {
                     Tuple<int, int> away = new Tuple<int, int>(start.Item1 + div, start.Item2);
-                    ind = GenerateGenesFromTo(start, away, ind, ref this.genes);
+                    GenerateGenesFromTo(start, away, ref this.genesList);
                     Tuple<int, int> pom = new Tuple<int, int>(away.Item1, stop.Item2);
-                    ind = GenerateGenesFromTo(away, pom, ind, ref this.genes);
-                    ind = GenerateGenesFromTo(pom, stop, ind, ref this.genes);
+                    GenerateGenesFromTo(away, pom, ref this.genesList);
+                    GenerateGenesFromTo(pom, stop, ref this.genesList);
                 }
                 else if ((start.Item2 < stop.Item2) && (start.Item2 - div > 0))
                 {
                     Tuple<int, int> away = new Tuple<int, int>(start.Item1, start.Item2 - div);
-                    ind = GenerateGenesFromTo(start, away, ind, ref this.genes);
+                    GenerateGenesFromTo(start, away, ref this.genesList);
                     Tuple<int, int> pom = new Tuple<int, int>(away.Item1, stop.Item2);
-                    ind = GenerateGenesFromTo(away, pom, ind, ref this.genes);
-                    ind = GenerateGenesFromTo(pom, stop, ind, ref this.genes);
+                    GenerateGenesFromTo(away, pom, ref this.genesList);
+                    GenerateGenesFromTo(pom, stop, ref this.genesList);
                 }
                 else if ((start.Item2 >= stop.Item2) && (start.Item2 + div < sizeOfMap.Item2))
                 {
                     Tuple<int, int> away = new Tuple<int, int>(start.Item1 + div, start.Item2);
-                    ind = GenerateGenesFromTo(start, away, ind, ref this.genes);
+                    GenerateGenesFromTo(start, away, ref this.genesList);
                     Tuple<int, int> pom = new Tuple<int, int>(away.Item1, stop.Item2 + div);
-                    ind = GenerateGenesFromTo(away, pom, ind, ref this.genes);
-                    ind = GenerateGenesFromTo(pom, stop, ind, ref this.genes);
+                    GenerateGenesFromTo(away, pom, ref this.genesList);
+                    GenerateGenesFromTo(pom, stop, ref this.genesList);
                 }
                 else
                     System.Console.WriteLine("Not implemented full initial random generator");
+                
+                genesList.Add(new Gene(stop));
             }
         }
 
-        public void clone(int from, int to, Gene[] newGenes, int ind)
+        public void Clone(int from, int to, List<Gene> newGenes)
         {
-            for (int i = from; i < to; i++)
+            for (int i = from; i<to; i++)
             {
-                newGenes[ind++] = this.genes[i];
+                newGenes.Add(this.genesList[i]);
             }
         }
         private int TryMutationCorner(Tuple<int, int> a, ref Tuple<int, int> b, Tuple<int, int> c)
         {
-            int success = 0;
+            int success = 1;
 
-            if ((a.Item1 == b.Item1 + 1) && (a.Item2 == b.Item2 - 1))
+            if ((a.Item1 == c.Item1 + 1) && (a.Item2 == c.Item2 - 1))
             {
-                if (a.Item1 == c.Item1)
+                if (a.Item1 == b.Item1)
                 {
                     // zamieniamy na prawo-dół
-                    c = new Tuple<int, int>(c.Item1 + 1, c.Item2 + 1);
+                    b = new Tuple<int, int>(b.Item1 + 1, b.Item2 + 1);
                 }
                 else
                 {
                     // zamieniamy na lewo-góra
-                    c = new Tuple<int, int>(c.Item1 - 1, c.Item2 - 1);
+                    b = new Tuple<int, int>(b.Item1 - 1, b.Item2 - 1);
                 }
 
             }
-            else if ((a.Item1 == b.Item1 - 1) && (a.Item2 == b.Item2 - 1))
+            else if ((a.Item1 == c.Item1 - 1) && (a.Item2 == c.Item2 - 1))
             {
-                if (a.Item1 == c.Item1)
+                if (a.Item1 == b.Item1)
                 {
                     // zamieniamy na prawo-góra
-                    c = new Tuple<int, int>(c.Item1 + 1, c.Item2 - 1);
+                    b = new Tuple<int, int>(b.Item1 + 1, b.Item2 - 1);
                 }
                 else
                 {
                     // zamieniamy na lewo - dół
-                    c = new Tuple<int, int>(c.Item1 - 1, c.Item2 + 1);
+                    b = new Tuple<int, int>(b.Item1 - 1, b.Item2 + 1);
                 }
             }
             else
@@ -312,47 +321,46 @@ namespace Roboptymalizator.geneticOptymalization
         {
             Random rn = new Random();
 
+            int lenght = genesList.ToArray().Length;
             int ind = rn.Next(1, lenght-2);
 
-            Tuple<int, int> a = genes[ind-1].value;
-            Tuple<int, int> b = genes[ind+1].value;
-            Tuple<int, int> c = genes[ind].value;
+            Tuple<int, int> a = genesList[ind-1].value;
+            Tuple<int, int> b = genesList[ind+1].value;
+            Tuple<int, int> c = genesList[ind].value;
 
             if (TryMutationCorner(a,ref c,b) == 0)
             {
-                Gene[] newGenes = new Gene[lenght];
+                List<Gene> newGenesList = new List<Gene>();
 
-                clone(0, ind - 1, newGenes, 0);
-                newGenes[ind] = new Gene(c);
-                clone(ind + 1, lenght, newGenes, ind + 1);
+                Clone(0, ind - 1, newGenesList);
+                newGenesList.Add(new Gene(c));
+                Clone(ind + 1, genesList.ToArray().Length, newGenesList);
+                genesList = newGenesList;
             }
-            // w całkiem przeciwnym razie nie mutujemy
-
         }
 
         public void MutationWithLenghtChanging()
         {
             Random rn = new Random();
+            int lenght = genesList.ToArray().Length;
+
             int ind = rn.Next(1, lenght-2);
 
-            Tuple<int, int> a = genes[ind - 1].value;
-            Tuple<int, int> b = genes[ind].value; // ten gen będziemy zmieniać
-            Tuple<int, int> c = genes[ind + 1].value;
+            Tuple<int, int> a = genesList[ind - 1].value;
+            Tuple<int, int> b = genesList[ind].value; // ten gen będziemy zmieniać
+            Tuple<int, int> c = genesList[ind + 1].value;
 
-            if (TryMutationCorner(a, ref b, c) == 0)
+            if (TryMutationCorner(a, ref b, c) == 1)
             {
                 Gene[] newGenes = new Gene[lenght];
+                List<Gene> newGenesList = new List<Gene>();
 
-                clone(0, ind - 1, newGenes, 0);
-                newGenes[ind] = new Gene(c);
-                clone(ind + 1, lenght, newGenes, ind + 1);
+                Clone(0, ind - 1, newGenesList);
+                newGenesList.Add(new Gene(c));
+                Clone(ind + 1, lenght, newGenesList);
             }
             else
             {
-                Gene[] firstGenes = new Gene[lenght];
-                clone(0, ind - 1, firstGenes, 0);
-                clone(ind + 1, lenght, firstGenes, ind + 1);
-
                 Tuple<int, int> newB;
                 // przypadek pierwszy - idziemy pionowo
                 if (a.Item1 == c.Item1)
@@ -367,41 +375,70 @@ namespace Roboptymalizator.geneticOptymalization
 
                     lenght += 2;
 
-                    if ((newB.Item1 < 0) || (newB.Item1 >= lenght))
+                    if ((newB.Item1 < 0) || (newB.Item1 > lenght))
                     {
                         lenght = lenght - 2;
                         newB = b;
                     }
-
-                    Gene[] newGenes = new Gene[lenght];
-                    clone(0, ind - 1, newGenes, ind);
                 }
                 else
                 {
+                    //a.Item2 == c.Item2
+                    int decission = rn.Next();
+                    if (decission % 2 == 0)
+                        // idziemy do góry
+                        newB = new Tuple<int, int>(b.Item1, b.Item2-1);
+                    else
+                        // idziemy w dół
+                        newB = new Tuple<int, int>(b.Item1, b.Item2+1);
 
+                    lenght += 3;
+
+                    if ((newB.Item2 < 0) || (newB.Item2 > lenght))
+                    {
+                        lenght = lenght - 2;
+                        newB = b;
+                    }
+                    
                 }
+
+                List<Gene> newGenesList = new List<Gene>();
+
+                Clone(0, ind, newGenesList);
+                
+                int indNew = ind;
+                GenerateStep(a, newB, ref newGenesList);
+                GenerateStep(newB, c, ref newGenesList);
+                
+                Clone(ind + 2, lenght, newGenesList);
+
+                genesList = newGenesList;
             }
         }
         public Chromosom Cross(Chromosom ch, Tuple<int, int> sizeOfMap)
         {
-            Chromosom son = new Chromosom(lenght);
+            Chromosom son = new Chromosom();
             
             Random rn = new Random();
+            int lenght = genesList.ToArray().Length;
 
             int ind = rn.Next(0, lenght / 2);
-            int value = rn.Next(Math.Min(genes[ind].value.Item2, ch.genes[ind].value.Item2), Math.Max(genes[ind].value.Item2, ch.genes[ind].value.Item2));
+            int value = rn.Next(Math.Min(genesList[ind].value.Item2, ch.genesList[ind].value.Item2), Math.Max(genesList[ind].value.Item2, ch.genesList[ind].value.Item2));
             
-            Gene[] newGenes = new Gene[lenght];
-            clone(0, 1, newGenes, 0);
-            clone(lenght - 1, lenght, newGenes, lenght - 1);
-            Tuple <int, int>  pom = new Tuple<int, int>(genes[ind].value.Item1, value);
-            int ind_pom = GenerateGenesFromTo(newGenes[0].value,pom  , 1, ref ch.genes);
-
+            List<Gene> newGenesList = new List<Gene>();
+            Clone(0, 1, newGenesList);
+            
+            Tuple <int, int>  pom = new Tuple<int, int>(genesList[ind].value.Item1, value);
+            GenerateGenesFromTo(newGenesList[0].value,pom  , ref newGenesList);
+            
             ind = rn.Next(lenght / 2, lenght-1);
-            value = rn.Next(Math.Min(genes[ind].value.Item2, ch.genes[ind].value.Item2), Math.Max(genes[ind].value.Item2, ch.genes[ind].value.Item2));
-            GenerateGenesFromTo(pom, newGenes[lenght-1].value, ind_pom, ref ch.genes);
+            value = rn.Next(Math.Min(genesList[ind].value.Item2, ch.genesList[ind].value.Item2), Math.Max(genesList[ind].value.Item2, ch.genesList[ind].value.Item2));
+            GenerateStep(newGenesList[newGenesList.ToArray().Length-1].value, genesList[lenght-1].value, ref newGenesList);
             
-            return ch;
+            //Clone(lenght - 1, lenght, newGenesList);
+
+            son.genesList = newGenesList;
+            return son;
         }
         public void SetFitness(double fit)
         {
@@ -411,11 +448,11 @@ namespace Roboptymalizator.geneticOptymalization
         public String ToString()
         {
             String a = "";
+            a += "fit: " + fitness  + "\n";
 
-            for (int i = 0; i<lenght; i++)
+            for (int i = 0; i<genesList.ToArray().Length; i++)
             {
-                a += genes[i].value.Item1 + " : " + genes[i].value.Item2 + " | ";
-                a += "\n fit: " + fitness;
+                a += genesList[i].value.Item1 + " : " + genesList[i].value.Item2 + " | ";
             }
 
             return a;

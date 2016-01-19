@@ -49,7 +49,7 @@ namespace Roboptymalizator.geneticOptymalization
 
             System.Console.WriteLine(ch.ToString());
 
-            for (int i=0; i<ch.GetGenes().Length - 1; i++)
+            for (int i=0; i<ch.GetGenesList().ToArray().Length - 1; i++)
             {
                 Gene g = ch.GetGene(i);
                 heart.Field fromField = terrain.GetField(g.value.Item1, g.value.Item2);

@@ -80,9 +80,11 @@ namespace Roboptymalizator.geneticOptymalization
             List<Chromosom> parents = SelectParents(listOfChromosoms, numOfChromosoms / 2 + 1);
             // krzyżowanie
             Random rn = new Random();
-            for (int i = 0; i < lenghtOfChromosom - parents.ToArray().Length ; i++)
+            for (int i = 0; i < numOfChromosoms - parents.ToArray().Length ; i++)
             {
-                int n = rn.Next(0,numOfChromosoms/2);
+                int n = i;
+                while (i == n)
+                    n = rn.Next(0, numOfChromosoms / 2 + 1);
                 Chromosom son = parents[i].Cross(parents[n],fs.terrain.GetSizeOfMap());
                 parents.Add(son);
             }
@@ -92,6 +94,7 @@ namespace Roboptymalizator.geneticOptymalization
                 if (rn.NextDouble() <= mutationRate)
                 {
                     ch.Mutation();
+                    //ch.MutationWithLenghtChanging();
                 }
             }
             // oblicz fitness dla każdego osobnika
@@ -112,10 +115,10 @@ namespace Roboptymalizator.geneticOptymalization
         {
             foreach(Generation g in generations)
             {
-                System.Console.WriteLine("### GENERATION : %d", g.number);
+                System.Console.WriteLine("\n\n ### GENERATION : {0:D}\n", g.number);
                 foreach (Chromosom ch in g.chromosomes)
                 {
-                    ch.ToString();
+                    System.Console.WriteLine(ch.ToString());
                 }
             }
         }
