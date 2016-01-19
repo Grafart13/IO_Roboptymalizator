@@ -10,7 +10,9 @@ namespace Roboptymalizator.geneticOptymalization
     {
         // populacja wszystkich pokoleń
         public List<Generation> generations { get; private set; }
-        private int minSize;
+
+        private double mutationRate;
+        private int currGeneration;
         private int numOfGeneration;
         private int numOfChromosoms;
         private int lenghtOfChromosom;
@@ -18,14 +20,15 @@ namespace Roboptymalizator.geneticOptymalization
 
         private FitnessService fs;
 
-        public Population (int lenghtOfChromosom, int numOfChromosoms, int numOfGeneration, FitnessService fs)
+        public Population (int lenghtOfChromosom, int numOfChromosoms, int numOfGeneration, double mutationRate, FitnessService fs)
         {
-            
+            this.mutationRate = mutationRate;
             this.lenghtOfChromosom = lenghtOfChromosom;
             this.numOfChromosoms = numOfChromosoms;
             this.numOfGeneration = numOfGeneration;
             generations = new List<Generation>();
             this.fs = fs;
+            currGeneration = 0;
         }
 
         public void createInitialGeneration()
@@ -39,14 +42,82 @@ namespace Roboptymalizator.geneticOptymalization
             {
                 Chromosom ch = new Chromosom(lenghtOfChromosom);
                 ch.RandomGenes(tm.GetStartInd(), tm.GetStopInd(), tm.GetSizeOfMap());
+                fs.ComputeFittness(ch);
                 chromosoms.Add(ch);
             }
+            // oblicz fitness dla każdego osobnika
+            foreach (Chromosom ch in chromosoms)
+                ch.SetFitness(fs.ComputeFittness(ch));
+
             generations.Add(new Generation(numGeneration, chromosoms));
         }
+        private static int ComputeSort (Chromosom ch1, Chromosom ch2)
+        {
+            double fit1 = ch1.fitness;
+            double fit2 = ch2.fitness;
 
+            return - fit1.CompareTo(fit2);
+        }
+        public void SortChromosoms(List<Chromosom> listOfChromosoms)
+        {
+            listOfChromosoms.Sort(ComputeSort);
+            //generations[++currGeneration] = new Generation()
+        }
+        private List<Chromosom> SelectParents(List<Chromosom> listOfChromosoms, int howMany)
+        {
+            List<Chromosom> parents = new List<Chromosom>();
+            for (int i = 0; i<howMany; i++)
+                parents.Add(listOfChromosoms[i]);
+            return parents;
+        }
+        private void CreateNextGeneration()
+        {
+            // wybieranie najlepszych osobników
+            List<Chromosom> listOfChromosoms = generations[currGeneration].chromosomes; 
+ 
+            SortChromosoms(listOfChromosoms);
+            // selekcja najlepszych osobników
+            List<Chromosom> parents = SelectParents(listOfChromosoms, numOfChromosoms / 2 + 1);
+            // krzyżowanie
+            Random rn = new Random();
+            for (int i = 0; i < lenghtOfChromosom - parents.ToArray().Length ; i++)
+            {
+                int n = rn.Next(0,numOfChromosoms/2);
+                Chromosom son = parents[i].Cross(parents[n],fs.terrain.GetSizeOfMap());
+                parents.Add(son);
+            }
+            // mutacje
+            foreach (Chromosom ch in parents)
+            {
+                if (rn.NextDouble() <= mutationRate)
+                {
+                    ch.Mutation();
+                }
+            }
+            // oblicz fitness dla każdego osobnika
+            foreach (Chromosom ch in parents)
+                ch.SetFitness(fs.ComputeFittness(ch));
+
+            generations.Add(new Generation(++currGeneration, parents));
+        }
+        public void CreateGenerations()
+        {
+            createInitialGeneration();
+            for(int i=1; i<numOfGeneration; i++)
+            {
+                CreateNextGeneration();
+            }
+        }
         public void ToString()
         {
-            
+            foreach(Generation g in generations)
+            {
+                System.Console.WriteLine("### GENERATION : %d", g.number);
+                foreach (Chromosom ch in g.chromosomes)
+                {
+                    ch.ToString();
+                }
+            }
         }
     }
 }

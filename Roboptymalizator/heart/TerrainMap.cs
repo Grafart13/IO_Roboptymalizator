@@ -9,6 +9,7 @@ namespace Roboptymalizator.heart
     class TerrainMap
     {
         private Field[,] fields;
+        private int sampleN = 6;
         private double x = 10.0; // is the width of the grid
         private Tuple<int, int> startInd;
         private Tuple<int, int> stopInd;
@@ -16,11 +17,10 @@ namespace Roboptymalizator.heart
         public TerrainMap()
         {
             // generate Terrain Map for testing
-            for (int i = 0; i < 10; i++)
-                for (int j = 0; j < 10; j++)
-                    fields[i, j] = new Field(2 * i + 3 * j + 0.2, new Tuple<int,int>(i,j));
-            
+            GenerateSampleFields();
+            AddMoves();
         }
+
         public TerrainMap(String name)
         {
             // loading terrain map from file
@@ -30,6 +30,26 @@ namespace Roboptymalizator.heart
         {
             GenerateRandomFields(n, m);
             AddMoves();
+        }
+        private void GenerateSampleFields()
+        {
+            fields = new Field[sampleN, sampleN];
+
+            double wys = 10.0;
+            fields[0, 0] = new Field(wys, new Tuple<int, int>(0, 0));
+            fields[0, 0].SetStart();
+            startInd = new Tuple<int, int>(0, 0);
+
+            for (int i = 0; i< sampleN; i++)
+            {
+                for (int j = 0; j< sampleN; j++)
+                {
+                    fields[i, j] = new Field(wys + i * j + j, new Tuple<int, int>(i, j));
+                    wys = wys > 100.0 ? 45.0 : wys + 10.0;
+                }
+            }
+            fields[sampleN -1, sampleN - 1].SetStop();
+            stopInd = new Tuple<int, int>(sampleN - 1, sampleN - 1);
         }
 
         private void GenerateRandomFields(int n, int m)

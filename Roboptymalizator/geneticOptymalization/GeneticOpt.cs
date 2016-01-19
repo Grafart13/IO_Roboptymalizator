@@ -24,8 +24,13 @@ namespace Roboptymalizator.geneticOptymalization
         public GeneticOpt (heart.TerrainMap tm, heart.Robot rob)
         {
             fitnessService = new FitnessService(tm, rob);
-            
-            population = new Population(10, 3, 5, fitnessService);
+        }
+
+        public void Run()
+        {
+            population = new Population(10, 3, 5, 0.9, fitnessService);
+            population.CreateGenerations();
+            population.ToString();
 
         }
 

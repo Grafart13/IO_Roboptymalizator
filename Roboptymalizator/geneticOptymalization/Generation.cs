@@ -11,12 +11,10 @@ namespace Roboptymalizator.geneticOptymalization
         // dane pokolenie
         public int number { get; private set; }
         public List<Chromosom> chromosomes { get; set; }
-        public Chromosom bestCh { get; set; }
-
-
+        
         public Generation(int number, List<Chromosom> ch)
         {
-            this.number = number;
+            this.number = number; // num of chromosoms
             this.chromosomes = ch;
         }
 

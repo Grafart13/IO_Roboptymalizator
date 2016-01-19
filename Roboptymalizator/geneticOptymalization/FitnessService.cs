@@ -47,6 +47,8 @@ namespace Roboptymalizator.geneticOptymalization
             double maxFuel = robot.fuelLevel;
             double currFuel = maxFuel;
 
+            System.Console.WriteLine(ch.ToString());
+
             for (int i=0; i<ch.GetGenes().Length - 1; i++)
             {
                 Gene g = ch.GetGene(i);
@@ -54,9 +56,6 @@ namespace Roboptymalizator.geneticOptymalization
                 Gene g2 = ch.GetGene(i + 1);
 
                 double burn = ComputeOneStepFuel(g.value, g2.value);
-                
-                if (currFuel - burn < 0)
-                    return -1.0;
 
                 currFuel -= burn;
             }
