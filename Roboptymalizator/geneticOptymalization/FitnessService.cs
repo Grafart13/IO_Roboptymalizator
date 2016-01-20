@@ -60,7 +60,8 @@ namespace Roboptymalizator.geneticOptymalization
                 currFuel -= burn;
             }
 
-            fitness = currFuel / maxFuel * 100.0;
+            //fitness = currFuel / maxFuel * 100.0;
+            fitness = currFuel;
             return fitness ;
         }
 

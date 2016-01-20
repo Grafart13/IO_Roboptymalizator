@@ -28,7 +28,7 @@ namespace Roboptymalizator.geneticOptymalization
 
         public void Run()
         {
-            population = new Population(10, 3, 5, 0.9, fitnessService);
+            population = new Population(10, 5, 100, 0.75, fitnessService);
             population.CreateGenerations();
             population.ToString();
 

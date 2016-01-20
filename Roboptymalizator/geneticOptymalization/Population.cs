@@ -73,11 +73,17 @@ namespace Roboptymalizator.geneticOptymalization
         private void CreateNextGeneration()
         {
             // wybieranie najlepszych osobników
-            List<Chromosom> listOfChromosoms = generations[currGeneration].chromosomes; 
- 
+            
+            List<Chromosom> listOfChromosoms = generations[currGeneration].chromosomes;
+            
+            // oblicz fitness dla każdego osobnika
+            foreach (Chromosom ch in listOfChromosoms)
+                ch.SetFitness(fs.ComputeFittness(ch));
+            
             SortChromosoms(listOfChromosoms);
             // selekcja najlepszych osobników
             List<Chromosom> parents = SelectParents(listOfChromosoms, numOfChromosoms / 2 + 1);
+            
             // krzyżowanie
             Random rn = new Random();
             for (int i = 0; i < numOfChromosoms - parents.ToArray().Length ; i++)
@@ -93,13 +99,15 @@ namespace Roboptymalizator.geneticOptymalization
             {
                 if (rn.NextDouble() <= mutationRate)
                 {
-                    ch.Mutation();
-                    //ch.MutationWithLenghtChanging();
+                    // ch.Mutation();
+                    ch.MutationWithLenghtChanging(fs.terrain.GetSizeOfMap());
                 }
             }
-            // oblicz fitness dla każdego osobnika
+
             foreach (Chromosom ch in parents)
                 ch.SetFitness(fs.ComputeFittness(ch));
+
+            SortChromosoms(parents);
 
             generations.Add(new Generation(++currGeneration, parents));
         }

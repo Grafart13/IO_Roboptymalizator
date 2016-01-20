@@ -229,7 +229,7 @@ namespace Roboptymalizator.geneticOptymalization
 
                 GenerateStep(start, point, ref genesList);
                 GenerateStep(point, stop, ref genesList);
-                genesList.Add(new Gene(stop));
+              //  genesList.Add(new Gene(stop));
             }
             else
             {
@@ -271,7 +271,7 @@ namespace Roboptymalizator.geneticOptymalization
                 else
                     System.Console.WriteLine("Not implemented full initial random generator");
                 
-                genesList.Add(new Gene(stop));
+                //genesList.Add(new Gene(stop));
             }
         }
 
@@ -339,8 +339,9 @@ namespace Roboptymalizator.geneticOptymalization
             }
         }
 
-        public void MutationWithLenghtChanging()
+        public void MutationWithLenghtChanging(Tuple<int, int> sizeOfMap)
         {
+            System.Console.WriteLine("Mutation with length changing...");
             Random rn = new Random();
             int lenght = genesList.ToArray().Length;
 
@@ -352,15 +353,17 @@ namespace Roboptymalizator.geneticOptymalization
 
             if (TryMutationCorner(a, ref b, c) == 1)
             {
+                System.Console.WriteLine("TryingMutationCorner...");
                 Gene[] newGenes = new Gene[lenght];
                 List<Gene> newGenesList = new List<Gene>();
 
-                Clone(0, ind - 1, newGenesList);
-                newGenesList.Add(new Gene(c));
+                Clone(0, ind, newGenesList);
+                newGenesList.Add(new Gene(b));
                 Clone(ind + 1, lenght, newGenesList);
             }
             else
             {
+                System.Console.WriteLine("TryingOtherMutation...");
                 Tuple<int, int> newB;
                 // przypadek pierwszy - idziemy pionowo
                 if (a.Item1 == c.Item1)
@@ -375,7 +378,7 @@ namespace Roboptymalizator.geneticOptymalization
 
                     lenght += 2;
 
-                    if ((newB.Item1 < 0) || (newB.Item1 > lenght))
+                    if ((newB.Item1 < 0) || (newB.Item1 >= sizeOfMap.Item1))
                     {
                         lenght = lenght - 2;
                         newB = b;
@@ -394,7 +397,7 @@ namespace Roboptymalizator.geneticOptymalization
 
                     lenght += 3;
 
-                    if ((newB.Item2 < 0) || (newB.Item2 > lenght))
+                    if ((newB.Item2 < 0) || (newB.Item2 >= sizeOfMap.Item2))
                     {
                         lenght = lenght - 2;
                         newB = b;
@@ -410,20 +413,22 @@ namespace Roboptymalizator.geneticOptymalization
                 GenerateStep(a, newB, ref newGenesList);
                 GenerateStep(newB, c, ref newGenesList);
                 
-                Clone(ind + 2, lenght, newGenesList);
+                Clone(ind + 2, genesList.ToArray().Length, newGenesList);
 
                 genesList = newGenesList;
             }
         }
         public Chromosom Cross(Chromosom ch, Tuple<int, int> sizeOfMap)
         {
+            System.Console.WriteLine("Crossing...");
             Chromosom son = new Chromosom();
             
             Random rn = new Random();
             int lenght = genesList.ToArray().Length;
 
             int ind = rn.Next(0, lenght / 2);
-            int value = rn.Next(Math.Min(genesList[ind].value.Item2, ch.genesList[ind].value.Item2), Math.Max(genesList[ind].value.Item2, ch.genesList[ind].value.Item2));
+            int ind_ch = ind * ch.genesList.ToArray().Length / lenght;
+            int value = rn.Next(Math.Min(genesList[ind].value.Item2, ch.genesList[ind_ch].value.Item2), Math.Max(genesList[ind].value.Item2, ch.genesList[ind_ch].value.Item2));
             
             List<Gene> newGenesList = new List<Gene>();
             Clone(0, 1, newGenesList);
@@ -432,7 +437,7 @@ namespace Roboptymalizator.geneticOptymalization
             GenerateGenesFromTo(newGenesList[0].value,pom  , ref newGenesList);
             
             ind = rn.Next(lenght / 2, lenght-1);
-            value = rn.Next(Math.Min(genesList[ind].value.Item2, ch.genesList[ind].value.Item2), Math.Max(genesList[ind].value.Item2, ch.genesList[ind].value.Item2));
+            value = rn.Next(Math.Min(genesList[ind].value.Item2, ch.genesList[ind_ch].value.Item2), Math.Max(genesList[ind].value.Item2, ch.genesList[ind_ch].value.Item2));
             GenerateStep(newGenesList[newGenesList.ToArray().Length-1].value, genesList[lenght-1].value, ref newGenesList);
             
             //Clone(lenght - 1, lenght, newGenesList);
