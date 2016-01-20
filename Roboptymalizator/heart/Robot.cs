@@ -8,20 +8,21 @@ namespace Roboptymalizator.heart
 {
     class Robot
     {
-        private double fuelLevel;
-        private const double burning = 2.3; // burning fuel / dist
+        public double fuelLevel {  get; private set; }
+        private const double burning = 3.4; // burning fuel / dist
         private const double maxFuel = 100.0;
         
         private TerrainMap terrain;
         // where is robot on grid?
         private Field start;
         private LinkedList<Field> visited;
+        // private LinkedList<Move> moves; // is it important?
 
         public Robot(TerrainMap terrain)
         {
             this.terrain = terrain;
 
-            this.start = terrain.GetStart();
+            this.start = terrain.GetStartField();
             if (start == null)
                 System.Console.WriteLine("Something went wrong.");
             visited = new LinkedList<Field>();
@@ -34,15 +35,31 @@ namespace Roboptymalizator.heart
             return this.start;
         }
 
-        private void BurnFuel(Move move)
+        public double BurnFuel(Move move)
         {
             // function of burning fuel
             // for example
-
+            double loseFuel = move.GetDist() * burning;
             if (move.IsUp())
-                fuelLevel -= move.GetDist() * burning + Math.Pow(5.4, move.GetAlfa());
+                loseFuel += Math.Pow(2.3, move.GetAlfa());
             else
-                fuelLevel -= move.GetDist() * burning + Math.Log10(move.GetAlfa());
+                loseFuel -= Math.Log10(move.GetAlfa());
+            return loseFuel;
+        }
+
+        public double Move(Move move)
+        {
+            double loseFuel = BurnFuel(move);
+            if (fuelLevel - loseFuel < 0)
+            {
+                return -1.0;
+            }
+            else
+            {
+                fuelLevel -= loseFuel;
+                visited.AddLast(move.GetToField());
+                return loseFuel;
+            }
         }
     }
 }

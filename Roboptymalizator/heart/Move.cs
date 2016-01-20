@@ -11,6 +11,7 @@ namespace Roboptymalizator.heart
         private double dist;
         private double tanAlfa;
         private bool isUp;
+        private Field toField;
         public Move(double dist, double tanAlfa)
         {
             this.dist = dist;
@@ -19,6 +20,7 @@ namespace Roboptymalizator.heart
 
         public Move(Field fromField, Field toField, double x) // x is the width of the grid
         {
+            this.toField = toField;
             this.dist = ComputeDist(fromField.GetHeight(), toField.GetHeight(), x);
             this.tanAlfa = ComputeAlfa(fromField.GetHeight(), toField.GetHeight(), x);
         }
@@ -30,6 +32,10 @@ namespace Roboptymalizator.heart
             return dist;
         }
 
+        public Field GetToField()
+        {
+            return toField;
+        }
         private double ComputeAlfa(double h1, double h2, double x)
         {
             double height = Math.Abs(h2 - h1);

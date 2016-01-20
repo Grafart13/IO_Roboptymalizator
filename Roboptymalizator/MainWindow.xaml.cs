@@ -48,5 +48,13 @@ namespace Roboptymalizator
 
             robot = new heart.Robot(terrainMap);
         }
+
+        private void TestGenetic_Click(object sender, RoutedEventArgs e)
+        {
+            heart.TerrainMap tm = new heart.TerrainMap();
+            heart.Robot rob = new heart.Robot(tm);
+            geneticOptymalization.GeneticOpt geneticOpt = new geneticOptymalization.GeneticOpt(tm, rob);
+            geneticOpt.Run();
+        }
     }
 }

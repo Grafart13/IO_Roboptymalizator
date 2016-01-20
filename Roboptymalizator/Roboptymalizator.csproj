@@ -71,6 +71,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="geneticOptymalization\Chromosom.cs" />
+    <Compile Include="geneticOptymalization\FitnessService.cs" />
+    <Compile Include="geneticOptymalization\Gene.cs" />
+    <Compile Include="geneticOptymalization\Generation.cs" />
+    <Compile Include="geneticOptymalization\GeneticOpt.cs" />
+    <Compile Include="geneticOptymalization\Population.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -96,6 +102,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

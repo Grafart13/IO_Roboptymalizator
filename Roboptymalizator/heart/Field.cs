@@ -12,12 +12,14 @@ namespace Roboptymalizator.heart
         private bool isStart;
         private bool isStop;
         private Move[] moves;
+        private Tuple<int, int> ind;
 
-        public Field(double _height)
+        public Field(double _height, Tuple<int, int> ind)
         {
             this.height = _height;
             this.isStart = this.isStop = false;
             this.moves = new Move[4]; // or 8 if we set up movement diagonally
+            this.ind = ind;
         }
 
         public void SetStart()
@@ -52,6 +54,11 @@ namespace Roboptymalizator.heart
         {
             if ((where < 4) && (where > -1))
                 moves[where] = move;
+        }
+
+        public Move GetMove(int which)
+        {
+            return moves[which];
         }
     }
 }
